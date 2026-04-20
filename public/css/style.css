@@ -872,11 +872,20 @@ input, textarea, button, select { font: inherit; }
   gap: 16px;
 }
 
+.footer-logo-badge {
+  background: white;
+  border-radius: 10px;
+  padding: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .footer-logo {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   object-fit: contain;
-  filter: brightness(0) invert(1);
+  display: block;
 }
 
 .footer-brand-text {
