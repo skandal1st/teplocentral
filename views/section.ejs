@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= section.title %> — <%= siteTitle %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand-block" href="/">
+          <img class="brand-mark" src="/logo.png" alt="Логотип Теплоцентраль" />
+          <div>
+            <div class="brand-name"><%= siteTitle %></div>
+          </div>
+        </a>
+      </div>
+      <div class="container top-nav">
+        <a href="/">Главная</a>
+        <% sections.forEach((item) => { %>
+        <a href="<%= item.route %>" class="<%= item.key === section.key ? 'active' : '' %>"><%= item.title %></a>
+        <% }) %>
+      </div>
+    </header>
+
+    <main class="container section-page">
+      <article class="section-page-card">
+        <h1><%= section.title %></h1>
+
+        <% if (section.image) { %>
+        <div class="section-photo-banner section-photo-banner--image">
+          <img src="<%= section.image %>" alt="<%= section.title %>" class="section-photo-banner-image" />
+        </div>
+        <% } else { %>
+        <div class="section-photo-banner">
+          <svg class="section-photo-banner-icon" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+            <circle cx="12" cy="13" r="4"/>
+          </svg>
+          <span class="section-photo-banner-label">Фотография раздела</span>
+        </div>
+        <% } %>
+
+        <% if (section.key === 'products_services' || section.key === 'disclosure') { %>
+          <% if (sectionDocuments && sectionDocuments.length) { %>
+            <section class="section-docs-block">
+              <ul class="docs-list">
+                <% sectionDocuments.forEach((file) => { %>
+                <li>
+                  <div class="doc-icon">DOC</div>
+                  <a class="doc-title" href="<%= file.url %>" target="_blank" rel="noopener noreferrer"><%= file.title %></a>
+                  <% if (file.description) { %><span class="docs-meta"><%= file.description %></span><% } %>
+                </li>
+                <% }) %>
+              </ul>
+            </section>
+          <% } %>
+          <div class="section-content"><%- section.content %></div>
+        <% } else if (section.key === 'vacancies') { %>
+
+          <% if (vacancies && vacancies.length) { %>
+            <% if (section.content && section.content.trim().length > 7) { %>
+              <div class="section-content" style="margin-bottom:24px"><%- section.content %></div>
+            <% } %>
+            <div class="vacancies-list">
+              <% vacancies.forEach(function(v) { %>
+              <div class="vacancy-card">
+                <div class="vacancy-card-top">
+                  <h2 class="vacancy-title"><%= v.title %></h2>
+                  <% if (v.url) { %>
+                  <a class="vacancies-apply-button" href="<%= v.url %>" target="_blank" rel="noopener noreferrer">Откликнуться</a>
+                  <% } %>
+                </div>
+                <% if (v.department || v.salary) { %>
+                <div class="vacancy-meta">
+                  <% if (v.department) { %><span class="vacancy-dept"><%= v.department %></span><% } %>
+                  <% if (v.salary) { %><span class="vacancy-salary"><%= v.salary %></span><% } %>
+                </div>
+                <% } %>
+                <% if (v.requirements) { %>
+                <div class="vacancy-section">
+                  <h3>Требования</h3>
+                  <p><%= v.requirements %></p>
+                </div>
+                <% } %>
+                <% if (v.conditions) { %>
+                <div class="vacancy-section">
+                  <h3>Условия</h3>
+                  <p><%= v.conditions %></p>
+                </div>
+                <% } %>
+                <% if (v.contact) { %>
+                <div class="vacancy-contact">Контакт: <strong><%= v.contact %></strong></div>
+                <% } %>
+              </div>
+              <% }) %>
+            </div>
+
+          <% } else { %>
+            <div class="section-content"><%- section.content %></div>
+          <% } %>
+
+        <% } else { %>
+          <div class="section-content"><%- section.content %></div>
+        <% } %>
+      </article>
+    </main>
+
+  </body>
+</html>

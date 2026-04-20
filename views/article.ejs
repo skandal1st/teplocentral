@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= article.title %> — <%= siteTitle %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand-block" href="/">
+          <img class="brand-mark" src="/logo.png" alt="Логотип Теплоцентраль" />
+          <div>
+            <div class="brand-name"><%= siteTitle %></div>
+          </div>
+        </a>
+      </div>
+      <div class="container top-nav">
+        <a href="/">Главная</a>
+        <% sections.forEach((item) => { %>
+        <a href="<%= item.route %>"><%= item.title %></a>
+        <% }) %>
+      </div>
+    </header>
+
+    <main class="container article-page">
+      <a class="article-back" href="/">← Все новости</a>
+
+      <article class="article-card">
+        <% if (article.cover) { %>
+        <div class="article-cover">
+          <img src="<%= article.cover %>" alt="<%= article.title %>" />
+        </div>
+        <% } %>
+
+        <div class="article-content">
+          <div class="article-meta">
+            <span class="article-date"><%= article.date %></span>
+          </div>
+          <h1 class="article-title"><%= article.title %></h1>
+
+          <% if (article.body && article.body.trim().length > 0) { %>
+            <div class="article-body prose"><%- article.body %></div>
+          <% } else { %>
+            <div class="article-body prose"><p><%= article.excerpt %></p></div>
+          <% } %>
+        </div>
+      </article>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand"><%= siteTitle %></div>
+        <div class="footer-copy">Официальный информационный ресурс муниципального предприятия</div>
+      </div>
+    </footer>
+
+  </body>
+</html>

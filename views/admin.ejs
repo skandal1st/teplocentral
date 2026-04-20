@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Управление сайтом</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet" />
+  </head>
+  <body class="admin-body">
+    <% var vacancies = (typeof locals.vacancies !== 'undefined') ? locals.vacancies : []; %>
+
+    <header class="admin-header">
+      <div class="container admin-header-inner">
+        <h1>Управление сайтом</h1>
+        <div class="admin-actions">
+          <a class="ghost-link" href="/" target="_blank" rel="noopener noreferrer">Открыть сайт ↗</a>
+          <form method="post" action="/admin/logout">
+            <button type="submit" class="danger-button">Выйти</button>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="admin-tabs">
+
+        <!-- ── TAB NAV ── -->
+        <nav class="admin-tab-nav" role="tablist" aria-label="Разделы панели управления">
+          <button class="admin-tab-btn" role="tab" aria-controls="tab-general"   aria-selected="false" id="btn-general">Общие</button>
+          <button class="admin-tab-btn" role="tab" aria-controls="tab-news"      aria-selected="false" id="btn-news">Новости</button>
+          <button class="admin-tab-btn" role="tab" aria-controls="tab-vacancies" aria-selected="false" id="btn-vacancies">Вакансии</button>
+          <button class="admin-tab-btn" role="tab" aria-controls="tab-sections"  aria-selected="false" id="btn-sections">Разделы</button>
+          <button class="admin-tab-btn" role="tab" aria-controls="tab-files"     aria-selected="false" id="btn-files">Файлы</button>
+        </nav>
+
+        <!-- ══════════════════════════════════════════
+             ТАБ 1 — ОБЩИЕ НАСТРОЙКИ
+             ══════════════════════════════════════════ -->
+        <div class="admin-tab-panel" id="tab-general" role="tabpanel">
+          <div class="section-card">
+            <h2>Общие настройки сайта</h2>
+            <form method="post" action="/admin/content/general" class="admin-form">
+
+              <label for="siteTitle">Название сайта</label>
+              <input id="siteTitle" name="siteTitle" type="text" value="<%= content.siteTitle %>" />
+
+              <label for="heroTitle">Заголовок первого экрана</label>
+              <input id="heroTitle" name="heroTitle" type="text" value="<%= content.heroTitle %>" />
+
+              <label for="heroSubtitle">Подзаголовок первого экрана</label>
+              <textarea id="heroSubtitle" name="heroSubtitle" rows="3"><%= content.heroSubtitle %></textarea>
+
+              <div class="admin-divider"></div>
+              <h3 style="font-size:0.95rem;font-weight:700;color:var(--black);margin-bottom:4px">Контакты аварийной службы</h3>
+
+              <% content.emergencyContacts.forEach((item, index) => { %>
+              <div class="admin-row">
+                <div>
+                  <label for="em_<%= index %>_label">Подпись</label>
+                  <input id="em_<%= index %>_label" name="emergency_<%= index %>_label" type="text" value="<%= item.label %>" />
+                </div>
+                <div>
+                  <label for="em_<%= index %>_value">Значение</label>
+                  <input id="em_<%= index %>_value" name="emergency_<%= index %>_value" type="text" value="<%= item.value %>" />
+                </div>
+              </div>
+              <% }) %>
+
+              <button type="submit" style="margin-top:8px">Сохранить</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             ТАБ 2 — НОВОСТИ
+             ══════════════════════════════════════════ -->
+        <div class="admin-tab-panel" id="tab-news" role="tabpanel">
+
+          <!-- Добавить новость -->
+          <div class="section-card" style="margin-bottom:16px">
+            <h2>Добавить новость</h2>
+            <form method="post" action="/admin/news/add" enctype="multipart/form-data" class="admin-form admin-form--compact">
+
+              <label for="news-add-title">Заголовок *</label>
+              <input id="news-add-title" name="title" type="text" required placeholder="Заголовок новости" />
+
+              <label for="news-add-excerpt">Краткий анонс (для главной страницы) *</label>
+              <textarea id="news-add-excerpt" name="excerpt" rows="2" required placeholder="1–2 предложения для карточки новости..."></textarea>
+
+              <label>Текст статьи</label>
+              <div class="quill-wrap">
+                <div id="quill-add" class="quill-editor" data-input="body-add"></div>
+              </div>
+              <textarea id="body-add" name="body" hidden></textarea>
+
+              <label for="cover-add">Обложка (изображение)</label>
+              <div class="cover-upload-wrap">
+                <input id="cover-add" name="cover" type="file" accept="image/*"
+                       class="cover-input" data-preview="cover-add-preview" />
+                <img id="cover-add-preview" class="cover-preview" src="" alt="" hidden />
+              </div>
+
+              <label for="news-add-date">Дата</label>
+              <input id="news-add-date" name="date" type="text"
+                     placeholder="<%= new Date().toLocaleDateString('ru-RU') %>" />
+
+              <button type="submit" style="margin-top:4px">Добавить новость</button>
+            </form>
+          </div>
+
+          <!-- Список новостей -->
+          <div class="section-card">
+            <h2>Опубликованные новости (<%= content.news.length %>)</h2>
+
+            <% if (!content.news.length) { %>
+              <p class="empty-state">Новостей пока нет.</p>
+            <% } %>
+
+            <% content.news.forEach(function(item) { %>
+            <div class="crud-card">
+              <div class="crud-card-header">
+                <div>
+                  <strong class="crud-card-title"><%= item.title %></strong>
+                  <span class="crud-card-meta"><%= item.date %></span>
+                </div>
+                <div class="crud-card-actions">
+                  <button type="button" class="ghost-button js-toggle-edit"
+                          data-target="news-edit-<%= item.id %>">Редактировать</button>
+                  <form method="post" action="/admin/news/delete/<%= item.id %>" style="display:inline">
+                    <button type="submit" class="danger-button danger-button--sm"
+                            onclick="return confirm('Удалить новость?')">Удалить</button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="crud-edit-panel" id="news-edit-<%= item.id %>" hidden>
+                <form method="post" action="/admin/news/edit/<%= item.id %>"
+                      enctype="multipart/form-data" class="admin-form admin-form--compact">
+
+                  <label>Заголовок</label>
+                  <input name="title" type="text" value="<%= item.title %>" required />
+
+                  <label>Краткий анонс (для главной страницы)</label>
+                  <textarea name="excerpt" rows="2"><%= item.excerpt %></textarea>
+
+                  <label>Текст статьи</label>
+                  <div class="quill-wrap">
+                    <div class="quill-editor"
+                         data-input="body-edit-<%= item.id %>"
+                         data-content="<%- encodeURIComponent(item.body || '') %>"></div>
+                  </div>
+                  <textarea id="body-edit-<%= item.id %>" name="body" hidden><%= item.body || '' %></textarea>
+
+                  <label>Обложка</label>
+                  <div class="cover-upload-wrap">
+                    <% if (item.cover) { %>
+                    <img class="cover-preview cover-preview--existing"
+                         src="<%= item.cover %>" alt="Текущая обложка" />
+                    <% } %>
+                    <input name="cover" type="file" accept="image/*"
+                           class="cover-input"
+                           data-preview="cover-preview-<%= item.id %>" />
+                    <img id="cover-preview-<%= item.id %>" class="cover-preview" src="" alt="" hidden />
+                  </div>
+
+                  <label>Дата</label>
+                  <input name="date" type="text" value="<%= item.date %>" />
+
+                  <div class="admin-form-footer">
+                    <button type="submit">Сохранить</button>
+                    <button type="button" class="ghost-button js-toggle-edit"
+                            data-target="news-edit-<%= item.id %>">Отмена</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             ТАБ 3 — ВАКАНСИИ
+             ══════════════════════════════════════════ -->
+        <div class="admin-tab-panel" id="tab-vacancies" role="tabpanel">
+
+          <!-- Добавить вакансию -->
+          <div class="section-card" style="margin-bottom:16px">
+            <h2>Добавить вакансию</h2>
+            <form method="post" action="/admin/vacancies/add" class="admin-form admin-form--compact">
+              <div class="admin-row">
+                <div>
+                  <label for="vac-add-title">Должность *</label>
+                  <input id="vac-add-title" name="title" type="text" required placeholder="Инженер-теплотехник" />
+                </div>
+                <div>
+                  <label for="vac-add-dept">Подразделение</label>
+                  <input id="vac-add-dept" name="department" type="text" placeholder="Производственный отдел" />
+                </div>
+              </div>
+
+              <label for="vac-add-salary">Зарплата</label>
+              <input id="vac-add-salary" name="salary" type="text" placeholder="от 55 000 ₽" />
+
+              <label for="vac-add-req">Требования</label>
+              <textarea id="vac-add-req" name="requirements" rows="3" placeholder="Опыт работы, образование, допуски..."></textarea>
+
+              <label for="vac-add-cond">Условия</label>
+              <textarea id="vac-add-cond" name="conditions" rows="3" placeholder="График, оформление, льготы..."></textarea>
+
+              <label for="vac-add-contact">Контакт для отклика</label>
+              <input id="vac-add-contact" name="contact" type="text" placeholder="hr@teplocentral.org" />
+
+              <label for="vac-add-url">Ссылка на вакансию (hh.ru или другая)</label>
+              <input id="vac-add-url" name="url" type="url" placeholder="https://hh.ru/vacancy/12345678" />
+
+              <button type="submit" style="margin-top:4px">Добавить вакансию</button>
+            </form>
+          </div>
+
+          <!-- Список вакансий -->
+          <div class="section-card">
+            <h2>Актуальные вакансии (<%= vacancies.length %>)</h2>
+
+            <% if (!vacancies.length) { %>
+              <div class="admin-notice" style="margin-bottom:12px">
+                Вакансий пока нет. Добавьте первую через форму выше — она сразу появится на странице
+                <a href="/vacancies" target="_blank" rel="noopener noreferrer">/vacancies</a>.
+              </div>
+            <% } %>
+
+            <% vacancies.forEach(function(v) { %>
+            <div class="crud-card">
+              <div class="crud-card-header">
+                <div>
+                  <strong class="crud-card-title"><%= v.title %></strong>
+                  <% if (v.department) { %><span class="crud-card-meta"><%= v.department %></span><% } %>
+                  <% if (v.salary) { %><span class="crud-card-badge"><%= v.salary %></span><% } %>
+                  <% if (v.url) { %>
+                  <a href="<%= v.url %>" target="_blank" rel="noopener noreferrer"
+                     class="crud-card-meta" style="text-decoration:underline;margin-left:4px">hh ↗</a>
+                  <% } else { %>
+                  <span class="crud-card-meta" style="margin-left:4px;color:#D44040">нет ссылки</span>
+                  <% } %>
+                </div>
+                <div class="crud-card-actions">
+                  <button type="button" class="ghost-button js-toggle-edit"
+                          data-target="vac-edit-<%= v.id %>">Редактировать</button>
+                  <form method="post" action="/admin/vacancies/delete/<%= v.id %>" style="display:inline">
+                    <button type="submit" class="danger-button danger-button--sm"
+                            onclick="return confirm('Удалить вакансию?')">Удалить</button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="crud-edit-panel" id="vac-edit-<%= v.id %>" hidden>
+                <form method="post" action="/admin/vacancies/edit/<%= v.id %>" class="admin-form admin-form--compact">
+                  <div class="admin-row">
+                    <div>
+                      <label>Должность *</label>
+                      <input name="title" type="text" value="<%= v.title %>" required />
+                    </div>
+                    <div>
+                      <label>Подразделение</label>
+                      <input name="department" type="text" value="<%= v.department %>" />
+                    </div>
+                  </div>
+
+                  <label>Зарплата</label>
+                  <input name="salary" type="text" value="<%= v.salary %>" />
+
+                  <label>Требования</label>
+                  <textarea name="requirements" rows="3"><%= v.requirements %></textarea>
+
+                  <label>Условия</label>
+                  <textarea name="conditions" rows="3"><%= v.conditions %></textarea>
+
+                  <label>Контакт для отклика</label>
+                  <input name="contact" type="text" value="<%= v.contact %>" />
+
+                  <label>Ссылка на вакансию (hh.ru или другая)</label>
+                  <input name="url" type="url" value="<%= v.url || '' %>"
+                         placeholder="https://hh.ru/vacancy/12345678" />
+
+                  <div class="admin-form-footer">
+                    <button type="submit">Сохранить</button>
+                    <button type="button" class="ghost-button js-toggle-edit"
+                            data-target="vac-edit-<%= v.id %>">Отмена</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             ТАБ 4 — РАЗДЕЛЫ САЙТА
+             ══════════════════════════════════════════ -->
+        <div class="admin-tab-panel" id="tab-sections" role="tabpanel">
+          <div class="section-card">
+            <h2>Разделы сайта</h2>
+            <div class="admin-notice" style="margin-bottom:16px">
+              Нажмите <strong>«Редактировать»</strong> рядом с нужным разделом.
+              Используйте визуальный редактор — знания HTML не нужны.
+            </div>
+
+            <% sections.forEach(function(section) { %>
+            <% if (section.key === 'vacancies') { return; } %>
+            <%
+              var docList = section.key === 'products_services'
+                ? productsServicesDocuments
+                : section.key === 'disclosure'
+                  ? disclosureDocuments
+                  : null;
+              var hasDocs = docList !== null;
+            %>
+            <div class="crud-card" style="margin-bottom:10px">
+
+              <!-- ── card header ── -->
+              <div class="crud-card-header">
+                <div>
+                  <strong class="crud-card-title"><%= section.title %></strong>
+                  <a href="<%= section.route %>" target="_blank" rel="noopener noreferrer"
+                     class="crud-card-meta" style="text-decoration:underline;margin-left:6px">открыть ↗</a>
+                  <% if (hasDocs) { %>
+                  <span class="crud-card-meta" style="margin-left:4px">· документов: <%= docList.length %></span>
+                  <% } %>
+                </div>
+                <div class="crud-card-actions">
+                  <button type="button" class="ghost-button js-toggle-edit"
+                          data-target="sec-edit-<%= section.key %>">Редактировать</button>
+                </div>
+              </div>
+
+              <!-- ── edit panel ── -->
+              <div class="crud-edit-panel" id="sec-edit-<%= section.key %>" hidden>
+
+                <!-- текст и изображение -->
+                <form method="post" action="/admin/content/section/<%= section.key %>"
+                      enctype="multipart/form-data" class="admin-form">
+
+                  <label for="sft_<%= section.key %>">Название страницы</label>
+                  <input id="sft_<%= section.key %>" name="title" type="text" value="<%= section.title %>" />
+
+                  <label>Баннерное фото</label>
+                  <% if (section.image) { %>
+                  <img src="<%= section.image %>" alt="<%= section.title %>"
+                       class="section-editor-image-preview" />
+                  <% } %>
+                  <input name="sectionImage" type="file" accept="image/*" />
+
+                  <label>Текст страницы</label>
+                  <div class="quill-wrap">
+                    <div class="quill-editor"
+                         data-input="sfc_<%= section.key %>"
+                         data-content="<%- encodeURIComponent(section.content || '') %>"></div>
+                  </div>
+                  <textarea id="sfc_<%= section.key %>" name="content" hidden><%= section.content %></textarea>
+
+                  <div class="admin-form-footer">
+                    <button type="submit">Сохранить текст</button>
+                    <button type="button" class="ghost-button js-toggle-edit"
+                            data-target="sec-edit-<%= section.key %>">Закрыть</button>
+                  </div>
+                </form>
+
+                <!-- документы (только для products_services и disclosure) -->
+                <% if (hasDocs) { %>
+                <div class="admin-divider" style="margin:20px 0 16px"></div>
+                <h3 style="font-size:0.92rem;font-weight:700;color:var(--black);margin-bottom:12px">
+                  Документы для скачивания
+                </h3>
+
+                <form method="post" action="/admin/section-documents/add"
+                      enctype="multipart/form-data"
+                      class="admin-form admin-form--compact" style="margin-bottom:14px">
+                  <input type="hidden" name="sectionType" value="<%= section.key %>" />
+                  <div class="admin-row">
+                    <div>
+                      <label>Название документа *</label>
+                      <input name="title" type="text" required
+                             placeholder="<%= section.key === 'products_services' ? 'Тариф 2026' : 'Раскрытие 2025-2026' %>" />
+                    </div>
+                    <div>
+                      <label>Описание</label>
+                      <input name="description" type="text" placeholder="Краткое описание" />
+                    </div>
+                  </div>
+                  <label>Файл (PDF, Word, Excel…) *</label>
+                  <input name="document" type="file" required />
+                  <button type="submit" style="margin-top:4px">Добавить документ</button>
+                </form>
+
+                <% if (!docList.length) { %>
+                  <p class="empty-state">Документов пока нет.</p>
+                <% } else { %>
+                  <ul class="admin-files-list">
+                    <% docList.forEach(function(file) { %>
+                    <li>
+                      <div class="file-main">
+                        <strong><%= file.title %></strong>
+                        <% if (file.description) { %><span><%= file.description %></span><% } %>
+                        <a href="<%= file.url %>" target="_blank" rel="noopener noreferrer"><%= file.originalName || file.url %></a>
+                      </div>
+                      <form method="post" action="/admin/section-documents/delete/<%= file.id %>">
+                        <input type="hidden" name="sectionType" value="<%= section.key %>" />
+                        <button type="submit" class="danger-button danger-button--sm"
+                                onclick="return confirm('Удалить документ?')">Удалить</button>
+                      </form>
+                    </li>
+                    <% }) %>
+                  </ul>
+                <% } %>
+                <% } %>
+
+              </div><!-- /crud-edit-panel -->
+            </div><!-- /crud-card -->
+            <% }) %>
+
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════
+             ТАБ 5 — ФАЙЛЫ И ДОКУМЕНТЫ
+             ══════════════════════════════════════════ -->
+        <div class="admin-tab-panel" id="tab-files" role="tabpanel">
+
+          <!-- Загрузить файл -->
+          <div class="section-card" style="margin-bottom:16px">
+            <h2>Загрузить файл</h2>
+            <form method="post" action="/admin/files/upload" enctype="multipart/form-data" class="admin-form admin-form--compact">
+              <label for="file-title">Название ссылки</label>
+              <input id="file-title" name="title" type="text" placeholder="Например, Годовой отчет 2026" />
+
+              <label for="file-input">Файл *</label>
+              <input id="file-input" name="document" type="file" required />
+
+              <button type="submit" style="margin-top:4px">Загрузить</button>
+            </form>
+          </div>
+
+          <!-- Список файлов -->
+          <div class="section-card">
+            <h2>Загруженные файлы (<%= files.length %>)</h2>
+
+            <% if (!files.length) { %>
+              <p class="empty-state">Файлов пока нет.</p>
+            <% } else { %>
+            <ul class="admin-files-list">
+              <% files.forEach(function(file) { %>
+              <li>
+                <div class="file-main">
+                  <strong><%= file.title %></strong>
+                  <a href="<%= file.url %>" target="_blank" rel="noopener noreferrer"><%= file.url %></a>
+                </div>
+                <form method="post" action="/admin/files/delete/<%= file.id %>">
+                  <button type="submit" class="danger-button danger-button--sm"
+                          onclick="return confirm('Удалить файл?')">Удалить</button>
+                </form>
+              </li>
+              <% }) %>
+            </ul>
+            <% } %>
+          </div>
+        </div>
+
+      </div><!-- /admin-tabs -->
+    </main>
+
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+      (function () {
+
+        // ── TABS ──────────────────────────────────────────────────────────────
+        var buttons = document.querySelectorAll('.admin-tab-btn');
+        var panels  = document.querySelectorAll('.admin-tab-panel');
+
+        function activate(hash) {
+          var targetId = (hash || '').replace('#', '') || 'tab-general';
+          var found = false;
+          buttons.forEach(function(btn) {
+            var on = btn.getAttribute('aria-controls') === targetId;
+            btn.classList.toggle('is-active', on);
+            btn.setAttribute('aria-selected', String(on));
+            if (on) found = true;
+          });
+          if (!found) {
+            buttons[0].classList.add('is-active');
+            buttons[0].setAttribute('aria-selected', 'true');
+            targetId = buttons[0].getAttribute('aria-controls');
+          }
+          panels.forEach(function(panel) {
+            panel.classList.toggle('is-active', panel.id === targetId);
+          });
+        }
+
+        buttons.forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            var id = btn.getAttribute('aria-controls');
+            history.replaceState(null, '', '#' + id);
+            activate('#' + id);
+          });
+        });
+        window.addEventListener('hashchange', function() { activate(location.hash); });
+        activate(location.hash);
+
+        // ── INLINE EDIT TOGGLE ────────────────────────────────────────────────
+        document.addEventListener('click', function(e) {
+          var btn = e.target.closest('.js-toggle-edit');
+          if (!btn) return;
+          var panel = document.getElementById(btn.dataset.target);
+          if (panel) panel.hidden = !panel.hidden;
+        });
+
+        // ── QUILL EDITORS ─────────────────────────────────────────────────────
+        var toolbarOptions = [
+          [{ header: [2, 3, 4, false] }],
+          ['bold', 'italic', 'underline'],
+          ['blockquote'],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['link', 'image'],
+          ['clean']
+        ];
+
+        var quillInstances = {};
+
+        function makeImageHandler(quillInstance) {
+          return function() {
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            input.click();
+            input.addEventListener('change', function() {
+              var file = input.files[0];
+              if (!file) return;
+              var fd = new FormData();
+              fd.append('image', file);
+              fetch('/admin/news/image', { method: 'POST', body: fd })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                  var range = quillInstance.getSelection(true);
+                  quillInstance.insertEmbed(range.index, 'image', data.url, Quill.sources.USER);
+                  quillInstance.setSelection(range.index + 1, Quill.sources.SILENT);
+                });
+            });
+          };
+        }
+
+        function initQuill(el) {
+          var inputId  = el.dataset.input;
+          var textarea = document.getElementById(inputId);
+          if (!textarea) return;
+
+          var quill = new Quill(el, {
+            theme: 'snow',
+            placeholder: 'Введите текст...',
+            modules: {
+              toolbar: {
+                container: toolbarOptions,
+                handlers: { image: makeImageHandler(null) }
+              }
+            }
+          });
+
+          // Fix: reassign image handler now that quill exists
+          quill.getModule('toolbar').handlers.image = makeImageHandler(quill);
+
+          // Pre-fill from data-content attribute (URL-encoded) or textarea value
+          var encoded = el.dataset.content;
+          var initial = encoded ? decodeURIComponent(encoded) : (textarea.value || '');
+          if (initial) quill.root.innerHTML = initial;
+
+          quillInstances[inputId] = quill;
+        }
+
+        // Init Quill for the add-form editor immediately
+        var addEditorEl = document.getElementById('quill-add');
+        if (addEditorEl) initQuill(addEditorEl);
+
+        // Init Quill for edit panels lazily when they first open
+        document.addEventListener('click', function(e) {
+          var toggleBtn = e.target.closest('.js-toggle-edit');
+          if (!toggleBtn) return;
+          var panelId = toggleBtn.dataset.target;
+          var panel = document.getElementById(panelId);
+          if (!panel || panel.hidden) return; // already closing
+          var editorEl = panel.querySelector('.quill-editor');
+          if (editorEl && !quillInstances[editorEl.dataset.input]) {
+            initQuill(editorEl);
+          }
+        });
+
+        // Before any form submit — sync Quill content to hidden textarea
+        document.addEventListener('submit', function(e) {
+          var form = e.target;
+          form.querySelectorAll('.quill-editor').forEach(function(el) {
+            var inputId = el.dataset.input;
+            var quill   = quillInstances[inputId];
+            var textarea = document.getElementById(inputId);
+            if (quill && textarea) {
+              textarea.value = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
+            }
+          });
+        });
+
+        // ── COVER IMAGE PREVIEW ───────────────────────────────────────────────
+        document.addEventListener('change', function(e) {
+          var input = e.target.closest('.cover-input');
+          if (!input || !input.files[0]) return;
+          var previewId = input.dataset.preview;
+          var preview   = previewId ? document.getElementById(previewId) : null;
+          if (!preview) return;
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            preview.src = ev.target.result;
+            preview.hidden = false;
+          };
+          reader.readAsDataURL(input.files[0]);
+        });
+
+      })();
+    </script>
+
+  </body>
+</html>

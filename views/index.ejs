@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= siteTitle %></title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <a class="brand-block" href="/">
+          <img class="brand-mark" src="/logo.png" alt="Логотип Теплоцентраль" />
+          <div>
+            <div class="brand-name"><%= siteTitle %></div>
+          </div>
+        </a>
+      </div>
+      <div class="container top-nav">
+        <% sections.forEach((section) => { %>
+        <a href="<%= section.route %>"><%= section.title %></a>
+        <% }) %>
+      </div>
+    </header>
+
+    <main>
+
+      <!-- ═══ HERO ═══ -->
+      <section class="hero">
+        <div class="container hero-inner">
+
+          <div class="hero-text">
+            <h1><%= heroTitle %></h1>
+            <p><%= heroSubtitle %></p>
+          </div>
+
+          <!-- Technical Schematic / Blueprint Illustration -->
+          <div class="hero-visual">
+            <svg class="hero-illustration" viewBox="0 0 500 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <!-- Grid background inside SVG for depth -->
+              <defs>
+                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.1"/>
+                </pattern>
+                <linearGradient id="orange-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#F39325" />
+                  <stop offset="100%" stop-color="#D97D12" />
+                </linearGradient>
+              </defs>
+              <rect width="500" height="400" fill="url(#grid)" />
+              
+              <!-- Main Central Engine/Hub -->
+              <circle cx="250" cy="200" r="120" stroke="var(--black)" stroke-width="1" stroke-dasharray="10 5" opacity="0.15" />
+              <circle cx="250" cy="200" r="80" stroke="var(--orange)" stroke-width="2" opacity="0.4" />
+              
+              <!-- Connection Lines (Technical Schematics) -->
+              <path d="M 50 100 L 250 200 L 450 100" stroke="var(--black)" stroke-width="1" opacity="0.2" />
+              <path d="M 50 300 L 250 200 L 450 300" stroke="var(--black)" stroke-width="1" opacity="0.2" />
+              <path d="M 100 200 L 400 200" stroke="var(--orange)" stroke-width="1.5" stroke-dasharray="20 10" opacity="0.3" />
+              
+              <!-- Industrial Nodes -->
+              <g class="node">
+                <rect x="235" y="185" width="30" height="30" rx="4" fill="var(--orange)" />
+                <circle cx="250" cy="200" r="6" fill="white" />
+              </g>
+              
+              <!-- Floating Technical Callouts -->
+              <g opacity="0.6">
+                <line x1="330" y1="120" x2="380" y2="80" stroke="var(--muted)" stroke-width="1" />
+                <rect x="380" y="60" width="80" height="20" rx="4" fill="var(--black)" />
+                <text x="388" y="74" font-family="monospace" font-size="8" fill="white">T: 75°C</text>
+              </g>
+              
+              <g opacity="0.6">
+                <line x1="170" y1="280" x2="120" y2="320" stroke="var(--muted)" stroke-width="1" />
+                <rect x="40" y="320" width="80" height="20" rx="4" fill="var(--black)" />
+                <text x="48" y="334" font-family="monospace" font-size="8" fill="white">P: 6.4 bar</text>
+              </g>
+              
+              <!-- Animated Pulse Rings -->
+              <circle cx="250" cy="200" r="140" stroke="var(--orange)" stroke-width="1" opacity="0.05">
+                <animate attributeName="r" from="140" to="180" dur="4s" repeatCount="indefinite" />
+                <animate attributeName="opacity" from="0.05" to="0" dur="4s" repeatCount="indefinite" />
+              </circle>
+            </svg>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══ EMERGENCY CONTACTS ═══ -->
+      <%
+        const emergencyIcons = [
+          /* siren */
+          `<svg class="emergency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+          /* thermometer */
+          `<svg class="emergency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>`,
+          /* droplet */
+          `<svg class="emergency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>`,
+          /* mail */
+          `<svg class="emergency-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`
+        ];
+      %>
+      <section class="emergency-section container">
+        <div class="emergency-header">
+          <h2>Контакты аварийной службы</h2>
+          <span class="emergency-badge">24 / 7</span>
+        </div>
+        <div class="emergency-grid">
+          <% emergencyContacts.forEach((item, i) => { %>
+          <div class="emergency-item">
+            <%- emergencyIcons[i] || emergencyIcons[0] %>
+            <div class="emergency-label"><%= item.label %></div>
+            <div class="emergency-value"><%= item.value %></div>
+          </div>
+          <% }) %>
+        </div>
+      </section>
+
+      <!-- ═══ SECTION NAVIGATION ═══ -->
+      <%
+        const navIcons = {
+          contacts: `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.72 11.6 19.79 19.79 0 0 1 1.67 3a2 2 0 0 1 1.99-2H6.6a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.56a16 16 0 0 0 6 6l.72-.72a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
+          procurement: `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>`,
+          products_services: `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+          disclosure: `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+          union: `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+          vacancies: `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>`
+        };
+        const defaultNavIcon = `<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>`;
+      %>
+      <nav class="nav-section container" aria-label="Разделы сайта">
+        <div class="nav-grid">
+          <% sections.forEach((section, i) => { %>
+          <a class="nav-item" href="<%= section.route %>">
+            <div class="nav-index">0<%= i + 1 %></div>
+            <%- navIcons[section.key] || defaultNavIcon %>
+            <span class="nav-title"><%= section.title %></span>
+            <div class="nav-arrow" aria-hidden="true">→</div>
+          </a>
+          <% }) %>
+        </div>
+      </nav>
+
+      <!-- ═══ NEWS ═══ -->
+      <section class="news-section container">
+        <h2 class="section-title">Новости</h2>
+        <div class="news-grid">
+          <% news.forEach((item, i) => { %>
+          <article class="news-card" style="--i: <%= i %>">
+            <% if (item.cover) { %>
+            <a href="<%= item.link || '#' %>" class="news-card-cover-link">
+              <img class="news-card-cover" src="<%= item.cover %>" alt="<%= item.title %>" />
+            </a>
+            <% } else { %>
+            <div class="photo-placeholder">
+              <svg class="photo-placeholder-icon" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                   stroke-linejoin="round" aria-hidden="true">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+              <span class="photo-placeholder-label">Фото</span>
+            </div>
+            <% } %>
+            <div class="news-date"><%= item.date %></div>
+            <h3><%= item.title %></h3>
+            <p><%= item.excerpt %></p>
+            <a class="read-link" href="<%= item.link || '#' %>">Читать далее →</a>
+          </article>
+          <% }) %>
+        </div>
+      </section>
+
+      <!-- ═══ SECTION PREVIEWS ═══ -->
+      <section class="container section-previews">
+        <% sections.slice(0, 2).forEach((section) => { %>
+        <article class="preview-card">
+          <h2><%= section.title %></h2>
+          <div class="section-content"><%- section.content %></div>
+          <a class="section-more" href="<%= section.route %>">Перейти в раздел →</a>
+        </article>
+        <% }) %>
+      </section>
+
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div class="footer-brand">
+          <img class="footer-logo" src="/logo.png" alt="Логотип Теплоцентраль" />
+          <div class="footer-brand-text"><%= siteTitle %></div>
+          <p class="footer-copy">Официальный информационный ресурс муниципального предприятия города Жуковский. Обеспечиваем надежное теплоснабжение и водоотведение.</p>
+        </div>
+        
+        <div class="footer-nav">
+          <div class="footer-heading">Навигация</div>
+          <ul class="footer-links">
+            <li><a href="/">Главная</a></li>
+            <% sections.forEach((section) => { %>
+            <li><a href="<%= section.route %>"><%= section.title %></a></li>
+            <% }) %>
+          </ul>
+        </div>
+
+        <div class="footer-contacts">
+          <div class="footer-heading">Контакты</div>
+          <ul class="footer-links">
+            <li><a href="tel:+74955562001">+7 (495) 556-20-01 (Приемная)</a></li>
+            <li><a href="mailto:info@teplojuk.ru">info@teplojuk.ru</a></li>
+            <li><span style="color: rgba(255,255,255,0.6); font-size: 0.88rem;">г. Жуковский, ул. Горького, д. 4</span></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="container">
+        <div class="footer-bottom">
+          <div class="footer-legal">© <%= new Date().getFullYear() %> МП «Теплоцентраль». Все права защищены.</div>
+          <div class="footer-legal">Разработано для граждан города</div>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>
